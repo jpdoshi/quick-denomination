@@ -26,10 +26,20 @@ export interface CalculationResult {
   unpayableAmount: number;
 }
 
+export type SplitPercentages = Record<number, number>;
+
+export const DEFAULT_SPLIT_PERCENTAGES: SplitPercentages = {
+  500: 50,
+  200: 30,
+  100: 20,
+};
+
 export interface SettingsState {
   currency: CurrencyCode;
   denominations: DenominationItem[];
   showQuickAdd: boolean;
+  splitEnabled: boolean;
+  splitPercentages: SplitPercentages;
 }
 
 export const CURRENCY_CONFIGS: Record<CurrencyCode, CurrencyConfig> = {

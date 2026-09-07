@@ -60,6 +60,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ isActive = true }) => {
     result,
     currency,
     showQuickAdd,
+    splitEnabled,
+    toggleSplitEnabled,
+    splitPercentages,
   } = useDenomination();
 
   useEffect(() => {
@@ -181,11 +184,113 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ isActive = true }) => {
           )}
         </View>
 
+        {/* Split Dispense Mode Toggle Card */}
+        <View style={[styles.splitCard, hardShadow(4)]}>
+          <View style={styles.splitCardHeader}>
+            <View style={styles.splitCardLeft}>
+              <View style={styles.splitCardTitleRow}>
+                <Ionicons
+                  name={splitEnabled ? 'pie-chart' : 'pie-chart-outline'}
+                  size={18}
+                  color={splitEnabled ? '#831843' : '#000'}
+                />
+                <Text style={styles.splitCardTitle}>SPLIT DISPENSE MODE</Text>
+                <View
+                  style={[
+                    styles.splitModeBadge,
+                    splitEnabled ? styles.splitModeBadgeOn : styles.splitModeBadgeOff,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.splitModeBadgeText,
+                      splitEnabled ? styles.splitModeBadgeTextOn : styles.splitModeBadgeTextOff,
+                    ]}
+                  >
+                    {splitEnabled ? 'SPLIT %' : 'GREEDY'}
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.splitCardSubtitle}>
+                {splitEnabled
+                  ? 'Dispensing notes by configured split percentages'
+                  : 'Standard: Dispensing largest notes first'}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={toggleSplitEnabled}
+              style={[
+                styles.splitToggleBtn,
+                splitEnabled ? styles.splitToggleBtnOn : styles.splitToggleBtnOff,
+                hardShadow(1.5),
+              ]}
+            >
+              <View
+                style={[
+                  styles.splitToggleThumb,
+                  splitEnabled ? styles.splitToggleThumbOn : styles.splitToggleThumbOff,
+                ]}
+              />
+              <Text
+                style={[
+                  styles.splitToggleText,
+                  splitEnabled ? styles.splitToggleTextOn : styles.splitToggleTextOff,
+                ]}
+              >
+                {splitEnabled ? 'ACTIVE' : 'OFF'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Active Split Percentages Preview Chips */}
+          {splitEnabled && (
+            <View style={styles.splitPreviewContainer}>
+              <Text style={styles.splitPreviewLabel}>CURRENT ALLOCATIONS:</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.splitChipsRow}
+              >
+                {Object.entries(splitPercentages)
+                  .filter(([_, pct]) => pct > 0)
+                  .sort(([a], [b]) => parseInt(b, 10) - parseInt(a, 10))
+                  .map(([val, pct]) => (
+                    <View key={val} style={[styles.splitChip, hardShadow(1)]}>
+                      <Text style={styles.splitChipDenom}>
+                        {activeCurrencyConfig.symbol}{val}:
+                      </Text>
+                      <Text style={styles.splitChipPct}>{pct}%</Text>
+                    </View>
+                  ))}
+              </ScrollView>
+            </View>
+          )}
+        </View>
+
         {/* Summary Card */}
         <View style={[styles.summaryCard, hardShadow(4)]}>
           <View style={styles.summaryTopRow}>
             <View style={styles.summaryMetric}>
-              <Text style={styles.summaryMetricLabel}>TOTAL PAYABLE</Text>
+              <View style={styles.summaryLabelRow}>
+                <Text style={styles.summaryMetricLabel}>TOTAL PAYABLE</Text>
+                <View
+                  style={[
+                    styles.modePill,
+                    splitEnabled ? styles.modePillSplit : styles.modePillGreedy,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.modePillText,
+                      splitEnabled ? styles.modePillTextSplit : styles.modePillTextGreedy,
+                    ]}
+                  >
+                    {splitEnabled ? '⚡ SPLIT %' : 'STANDARD'}
+                  </Text>
+                </View>
+              </View>
               <Text style={styles.summaryMetricValue}>
                 {formatCurrencyAmount(result.totalAmount, currency)}
               </Text>
@@ -493,7 +598,7 @@ const styles = StyleSheet.create({
   notesCountBadge: {
     backgroundColor: '#FFF',
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 5,
     borderRadius: 6,
     alignItems: 'center',
     minWidth: 80,
@@ -636,5 +741,161 @@ const styles = StyleSheet.create({
   },
   noteCountTextZero: {
     color: '#9CA3AF',
+  },
+  splitCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+  },
+  splitCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  splitCardLeft: {
+    flex: 1,
+    marginRight: 10,
+  },
+  splitCardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 2,
+  },
+  splitCardTitle: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#000',
+    letterSpacing: 0.5,
+  },
+  splitModeBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: '#000',
+  },
+  splitModeBadgeOn: {
+    backgroundColor: '#FBCFE8',
+  },
+  splitModeBadgeOff: {
+    backgroundColor: '#E5E7EB',
+  },
+  splitModeBadgeText: {
+    fontSize: 9,
+    fontWeight: '900',
+  },
+  splitModeBadgeTextOn: {
+    color: '#831843',
+  },
+  splitModeBadgeTextOff: {
+    color: '#4B5563',
+  },
+  splitCardSubtitle: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#4B5563',
+  },
+  splitToggleBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    gap: 6,
+    minWidth: 80,
+    justifyContent: 'center',
+  },
+  splitToggleBtnOn: {
+    backgroundColor: '#86EFAC',
+  },
+  splitToggleBtnOff: {
+    backgroundColor: '#E5E7EB',
+  },
+  splitToggleThumb: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  splitToggleThumbOn: {
+    backgroundColor: '#065F46',
+  },
+  splitToggleThumbOff: {
+    backgroundColor: '#9CA3AF',
+  },
+  splitToggleText: {
+    fontSize: 11,
+    fontWeight: '900',
+  },
+  splitToggleTextOn: {
+    color: '#064E3B',
+  },
+  splitToggleTextOff: {
+    color: '#6B7280',
+  },
+  splitPreviewContainer: {
+    marginTop: 10,
+    paddingTop: 8,
+    borderTopWidth: 1.5,
+    borderTopColor: '#E5E7EB',
+  },
+  splitPreviewLabel: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: '#6B7280',
+    marginBottom: 6,
+    letterSpacing: 0.5,
+  },
+  splitChipsRow: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  splitChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF08A',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    gap: 4,
+  },
+  splitChipDenom: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#000',
+  },
+  splitChipPct: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#854D0E',
+  },
+  summaryLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  modePill: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: '#000',
+  },
+  modePillSplit: {
+    backgroundColor: '#FBCFE8',
+  },
+  modePillGreedy: {
+    backgroundColor: '#FEF08A',
+  },
+  modePillText: {
+    fontSize: 9,
+    fontWeight: '900',
+  },
+  modePillTextSplit: {
+    color: '#831843',
+  },
+  modePillTextGreedy: {
+    color: '#713F12',
   },
 });
