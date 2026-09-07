@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Platform,
   ScrollView,
@@ -174,9 +174,6 @@ export const SettingsScreen: React.FC = () => {
             <Text style={styles.headerBadgeText}>PREFERENCES</Text>
           </View>
           <Text style={styles.headerTitle}>Settings</Text>
-          <Text style={styles.headerSubtitle}>
-            Configure currency, split allocations & active notes
-          </Text>
         </View>
 
         {/* Currency Selector Section */}
@@ -185,9 +182,6 @@ export const SettingsScreen: React.FC = () => {
             <Ionicons name="cash-outline" size={20} color="#000" />
             <Text style={styles.sectionTitle}>CURRENCY SYSTEM</Text>
           </View>
-          <Text style={styles.sectionDescription}>
-            Select primary currency. INR formats amounts with Indian comma grouping (e.g. 1,00,000).
-          </Text>
 
           <View style={styles.currencyChipsGrid}>
             {CURRENCIES.map((code) => {
@@ -243,9 +237,6 @@ export const SettingsScreen: React.FC = () => {
             <Ionicons name="flash-outline" size={20} color="#000" />
             <Text style={styles.sectionTitle}>QUICK-ADD PRESETS</Text>
           </View>
-          <Text style={styles.sectionDescription}>
-            Display rapid quick-add buttons (+1K, +5K, +10K, +50K) below the amount input on Cashier screen.
-          </Text>
 
           <View
             style={[
@@ -296,9 +287,6 @@ export const SettingsScreen: React.FC = () => {
             <Ionicons name="pie-chart-outline" size={20} color="#000" />
             <Text style={styles.sectionTitle}>PERCENTAGE SPLIT CONFIGURATION</Text>
           </View>
-          <Text style={styles.sectionDescription}>
-            Select which notes participate in the split and adjust their sliders. Total must equal exactly 100% before saving preset.
-          </Text>
 
           {/* Master Split Feature Toggle */}
           <View
@@ -313,7 +301,7 @@ export const SettingsScreen: React.FC = () => {
               <View style={styles.denomMeta}>
                 <Text style={styles.denomLabel}>Split Dispense Feature</Text>
                 <Text style={styles.denomSubLabelText}>
-                  {splitEnabled ? 'Active (Percentage allocation enabled on Cashier)' : 'Disabled (Standard greedy active)'}
+                  {splitEnabled ? 'Split Denomination' : 'Standard denomination'}
                 </Text>
               </View>
             </View>
@@ -352,9 +340,6 @@ export const SettingsScreen: React.FC = () => {
               </View>
               <View style={styles.stepHeaderTextGroup}>
                 <Text style={styles.stepTitle}>SELECT NOTES TO SPLIT</Text>
-                <Text style={styles.stepSubtitle}>
-                  Check notes to include in the split preset
-                </Text>
               </View>
             </View>
 
@@ -399,9 +384,6 @@ export const SettingsScreen: React.FC = () => {
               </View>
               <View style={styles.stepHeaderTextGroup}>
                 <Text style={styles.stepTitle}>ADJUST NOTE PERCENTAGES</Text>
-                <Text style={styles.stepSubtitle}>
-                  Use quick preset chips or tap -/+ buttons for precision
-                </Text>
               </View>
             </View>
 
@@ -505,9 +487,6 @@ export const SettingsScreen: React.FC = () => {
               </View>
               <View style={styles.stepHeaderTextGroup}>
                 <Text style={styles.stepTitle}>VALIDATE & SAVE PRESET</Text>
-                <Text style={styles.stepSubtitle}>
-                  Percentages must total exactly 100% before saving
-                </Text>
               </View>
             </View>
 
@@ -518,8 +497,8 @@ export const SettingsScreen: React.FC = () => {
                 isExact100
                   ? styles.validationBannerGreen
                   : totalPercentage < 100
-                  ? styles.validationBannerAmber
-                  : styles.validationBannerRed,
+                    ? styles.validationBannerAmber
+                    : styles.validationBannerRed,
                 hardShadow(2),
               ]}
             >
@@ -528,16 +507,16 @@ export const SettingsScreen: React.FC = () => {
                   isExact100
                     ? 'checkmark-circle'
                     : totalPercentage < 100
-                    ? 'warning'
-                    : 'alert-circle'
+                      ? 'warning'
+                      : 'alert-circle'
                 }
                 size={22}
                 color={
                   isExact100
                     ? '#065F46'
                     : totalPercentage < 100
-                    ? '#92400E'
-                    : '#991B1B'
+                      ? '#92400E'
+                      : '#991B1B'
                 }
               />
               <View style={styles.validationTextGroup}>
@@ -547,15 +526,15 @@ export const SettingsScreen: React.FC = () => {
                     isExact100
                       ? styles.validationTitleGreen
                       : totalPercentage < 100
-                      ? styles.validationTitleAmber
-                      : styles.validationTitleRed,
+                        ? styles.validationTitleAmber
+                        : styles.validationTitleRed,
                   ]}
                 >
                   {isExact100
                     ? 'TOTAL: 100% (BALANCED)'
                     : totalPercentage < 100
-                    ? `TOTAL: ${totalPercentage}% (${100 - totalPercentage}% SHORT OF 100%)`
-                    : `TOTAL: ${totalPercentage}% (EXCEEDS 100% BY ${totalPercentage - 100}%)`}
+                      ? `TOTAL: ${totalPercentage}% (${100 - totalPercentage}% SHORT OF 100%)`
+                      : `TOTAL: ${totalPercentage}% (EXCEEDS 100% BY ${totalPercentage - 100}%)`}
                 </Text>
                 <Text
                   style={[
@@ -563,15 +542,15 @@ export const SettingsScreen: React.FC = () => {
                     isExact100
                       ? styles.validationSubtitleGreen
                       : totalPercentage < 100
-                      ? styles.validationSubtitleAmber
-                      : styles.validationSubtitleRed,
+                        ? styles.validationSubtitleAmber
+                        : styles.validationSubtitleRed,
                   ]}
                 >
                   {isExact100
                     ? 'Preset is perfectly balanced! Tap Save Split Preset below.'
                     : totalPercentage < 100
-                    ? 'Cannot save: total must not be less than 100%. Tap "Auto-Balance" or adjust sliders.'
-                    : 'Cannot save: total must not exceed 100%. Reduce sliders or tap "Auto-Balance".'}
+                      ? 'Cannot save: total must not be less than 100%. Tap "Auto-Balance" or adjust sliders.'
+                      : 'Cannot save: total must not exceed 100%. Reduce sliders or tap "Auto-Balance".'}
                 </Text>
               </View>
             </View>
@@ -586,8 +565,8 @@ export const SettingsScreen: React.FC = () => {
                     backgroundColor: isExact100
                       ? '#10B981'
                       : totalPercentage < 100
-                      ? '#F59E0B'
-                      : '#EF4444',
+                        ? '#F59E0B'
+                        : '#EF4444',
                   },
                 ]}
               />
@@ -671,9 +650,6 @@ export const SettingsScreen: React.FC = () => {
             <Ionicons name="list-circle-outline" size={22} color="#000" />
             <Text style={styles.sectionTitle}>DENOMINATION MANAGER</Text>
           </View>
-          <Text style={styles.sectionDescription}>
-            Toggle notes on/off. Inactive notes are skipped by the Greedy Denomination algorithm.
-          </Text>
 
           <View style={styles.denominationsList}>
             {denominations.map((denom) => {
@@ -832,7 +808,7 @@ const styles = StyleSheet.create({
     width: '48%',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    padding: 10,
     borderRadius: 8,
     gap: 10,
   },
@@ -1030,9 +1006,9 @@ const styles = StyleSheet.create({
   checkButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    gap: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
     borderRadius: 6,
   },
   checkButtonSelected: {
@@ -1071,12 +1047,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   sliderCardsList: {
-    gap: 10,
+    gap: 5,
   },
   sliderCard: {
     backgroundColor: '#FFF',
     borderRadius: 8,
-    padding: 12,
+    padding: 10,
   },
   sliderCardHeader: {
     flexDirection: 'row',

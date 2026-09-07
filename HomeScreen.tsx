@@ -111,7 +111,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ isActive = true }) => {
               <Text style={styles.headerBadgeText}>TELLER DESK</Text>
             </View>
             <Text style={styles.headerTitle}>Cash Payment Counter</Text>
-            <Text style={styles.headerSubtitle}>Cash Payment Tally Counter</Text>
           </View>
         </View>
 
@@ -195,27 +194,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ isActive = true }) => {
                   color={splitEnabled ? '#831843' : '#000'}
                 />
                 <Text style={styles.splitCardTitle}>SPLIT DISPENSE MODE</Text>
-                <View
-                  style={[
-                    styles.splitModeBadge,
-                    splitEnabled ? styles.splitModeBadgeOn : styles.splitModeBadgeOff,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.splitModeBadgeText,
-                      splitEnabled ? styles.splitModeBadgeTextOn : styles.splitModeBadgeTextOff,
-                    ]}
-                  >
-                    {splitEnabled ? 'SPLIT %' : 'GREEDY'}
-                  </Text>
-                </View>
               </View>
-              <Text style={styles.splitCardSubtitle}>
-                {splitEnabled
-                  ? 'Dispensing notes by configured split percentages'
-                  : 'Standard: Dispensing largest notes first'}
-              </Text>
+              <Text style={styles.splitPreviewLabel}>CURRENT ALLOCATIONS</Text>
             </View>
 
             <TouchableOpacity
@@ -247,7 +227,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ isActive = true }) => {
           {/* Active Split Percentages Preview Chips */}
           {splitEnabled && (
             <View style={styles.splitPreviewContainer}>
-              <Text style={styles.splitPreviewLabel}>CURRENT ALLOCATIONS:</Text>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -275,21 +254,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ isActive = true }) => {
             <View style={styles.summaryMetric}>
               <View style={styles.summaryLabelRow}>
                 <Text style={styles.summaryMetricLabel}>TOTAL PAYABLE</Text>
-                <View
-                  style={[
-                    styles.modePill,
-                    splitEnabled ? styles.modePillSplit : styles.modePillGreedy,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.modePillText,
-                      splitEnabled ? styles.modePillTextSplit : styles.modePillTextGreedy,
-                    ]}
-                  >
-                    {splitEnabled ? '⚡ SPLIT %' : 'STANDARD'}
-                  </Text>
-                </View>
               </View>
               <Text style={styles.summaryMetricValue}>
                 {formatCurrencyAmount(result.totalAmount, currency)}
@@ -844,7 +808,6 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '900',
     color: '#6B7280',
-    marginBottom: 6,
     letterSpacing: 0.5,
   },
   splitChipsRow: {

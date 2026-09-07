@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Keyboard,
   Platform,
@@ -127,7 +127,6 @@ export const ReceiptScreen: React.FC = () => {
               <Text style={styles.headerBadgeText}>RECEIPT DESK</Text>
             </View>
             <Text style={styles.headerTitle}>Cash Receipt Counter</Text>
-            <Text style={styles.headerSubtitle}>Deposit tally (per active settings notes)</Text>
           </View>
 
           {/* Reset All Button */}
@@ -163,9 +162,6 @@ export const ReceiptScreen: React.FC = () => {
         {/* Section Title */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>NOTE QUANTITIES</Text>
-          <Text style={styles.sectionSubtitle}>
-            {visibleDenominations.length} denominations enabled in Settings
-          </Text>
         </View>
 
         {/* Note Input Fields List */}
@@ -350,7 +346,7 @@ const styles = StyleSheet.create({
   notesCountBadge: {
     backgroundColor: '#FFF',
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 5,
     borderRadius: 6,
     alignItems: 'center',
     minWidth: 80,

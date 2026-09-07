@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import React, { useState } from 'react';
 import {
+  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -28,6 +29,7 @@ const hardShadow = (offset = 3, bg = '#000') => ({
 });
 
 const UPI_ID = 'jpdoshi2811@okaxis';
+const GITHUB_URL = 'https://github.com/jpdoshi/quick-denominator';
 
 export const AboutScreen: React.FC = () => {
   const [copied, setCopied] = useState(false);
@@ -39,6 +41,14 @@ export const AboutScreen: React.FC = () => {
       setTimeout(() => setCopied(false), 2500);
     } catch (e) {
       console.error('Failed to copy to clipboard', e);
+    }
+  };
+
+  const handleOpenGitHub = async () => {
+    try {
+      await Linking.openURL(GITHUB_URL);
+    } catch (e) {
+      console.error('Failed to open GitHub link', e);
     }
   };
 
@@ -54,7 +64,6 @@ export const AboutScreen: React.FC = () => {
             <Text style={styles.headerBadgeText}>ABOUT & DEDICATION</Text>
           </View>
           <Text style={styles.headerTitle}>Built for Quick Calculation</Text>
-          <Text style={styles.headerSubtitle}>Cash Denomination Helper</Text>
         </View>
 
         {/* Dedication Card */}
@@ -64,13 +73,13 @@ export const AboutScreen: React.FC = () => {
               <Text style={styles.heartText}>❤️</Text>
             </View>
             <View style={styles.dedicationTextGroup}>
-              <Text style={styles.dedicationTitle}>Dedicated to Bank Tellers</Text>
-              <Text style={styles.dedicationRole}>Indian Banking Cashiers</Text>
+              <Text style={styles.dedicationTitle}>Dedicated to Cashiers</Text>
+              <Text style={styles.dedicationRole}>Quick Denomination Calculator</Text>
             </View>
           </View>
           <Text style={styles.dedicationParagraph}>
-            Every single working day, bank cashiers count and verify lakhs of rupees across thousands
-            of physical currency notes under immense branch pressure.
+            Every single working day, cashiers count and verify money amount across thousands
+            of physical currency notes under immense pressure.
           </Text>
           <Text style={styles.dedicationParagraph}>
             This tool is built to eliminate mental fatigue, guarantee zero calculation errors, and
@@ -119,6 +128,21 @@ export const AboutScreen: React.FC = () => {
                 </Text>
               </TouchableOpacity>
             </View>
+          </View>
+
+          {/* GitHub Repository Link Button */}
+          <View style={styles.githubContainer}>
+            <Text style={styles.githubLabel}>GITHUB REPO:</Text>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={handleOpenGitHub}
+              style={[styles.githubButton, hardShadow(2)]}
+            >
+              <View style={styles.githubButtonLeft}>
+                <Ionicons name="logo-github" size={20} color="#FFF" />
+                <Text style={styles.githubButtonText}>Explore Github Repo</Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -373,6 +397,51 @@ const styles = StyleSheet.create({
   },
   copyButtonTextDone: {
     color: '#065F46',
+  },
+  githubContainer: {
+    marginTop: 12,
+    gap: 6,
+  },
+  githubLabel: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#000',
+    letterSpacing: 0.5,
+  },
+  githubButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#000',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  githubButtonLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  githubButtonText: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: '#FFF',
+    letterSpacing: 0.5,
+  },
+  githubBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#67E8F9',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  githubBadgeText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#000',
+    letterSpacing: 0.5,
   },
   techCard: {
     backgroundColor: '#FFF',
