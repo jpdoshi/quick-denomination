@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Quick Denominator",
-    "slug": "quick-denominator",
+    "name": "Quick Denomination",
+    "slug": "quick-denomination",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "quickdenominator",
+    "scheme": "quickdenomination",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

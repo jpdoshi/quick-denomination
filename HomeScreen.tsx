@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Keyboard,
   Platform,
@@ -108,9 +108,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ isActive = true }) => {
               <Text style={styles.headerBadgeText}>TELLER DESK</Text>
             </View>
             <Text style={styles.headerTitle}>Cash Payment Counter</Text>
-            <Text style={styles.headerSubtitle}>
-              {currency === 'INR' ? 'Indian Bank Mode (en-IN)' : `${currency} Cashier Mode`}
-            </Text>
+            <Text style={styles.headerSubtitle}>Cash Payment Tally Counter</Text>
           </View>
         </View>
 
@@ -161,7 +159,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ isActive = true }) => {
               <View style={styles.presetButtonsRow}>
                 {[
                   { label: '+1K', value: 1000, color: '#86EFAC' },
-                  { label: '+5K', value: 500, color: '#67E8F9' },
+                  { label: '+5K', value: 5000, color: '#67E8F9' },
                   { label: '+10K', value: 10000, color: '#FDE047' },
                   { label: '+50K', value: 50000, color: '#FDA4AF' },
                 ].map((preset) => (
