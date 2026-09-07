@@ -1,6 +1,6 @@
-import "../global.css";
 import { Stack } from "expo-router";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
+import "../global.css";
 import { SettingsProvider } from "../useDenomination";
 
 export default function RootLayout() {
