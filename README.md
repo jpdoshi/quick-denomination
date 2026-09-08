@@ -1,50 +1,35 @@
-# Welcome to your Expo app 👋
+<img src="https://raw.githubusercontent.com/jpdoshi/quick-denomination/refs/heads/main/assets/images/logo.png" alt="Quick Denomination" style="width: 80px;" />
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# Quick Denomination
 
-## Get started
+Quick Denomination is a free and open source app made to make cashiers' lives easier.
+
+## Local Setup
+
+1. Clone repository
+
+   ```bash
+   git clone https://github.com/jpdoshi/quick-denomination.git
+   ```
 
 1. Install dependencies
 
    ```bash
+   cd quick-denomination
    npm install
    ```
 
 2. Start the app
 
    ```bash
-   npx expo start
+   npm start
    ```
 
-In the output, you'll find options to open the app in a
+## Todos
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- project: file structure
+- breakdown: calculate coins
+- terminologies: breakdown and count
+- ui: fix shadows on android
+- repo: release apk
+- feat: share calculation and save history
