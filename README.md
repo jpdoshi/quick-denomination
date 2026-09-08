@@ -28,7 +28,7 @@ Quick Denomination is a free and open source app made to make cashiers' lives ea
 ## Todos
 
 - project: file structure
-- breakdown: calculate coins
+- settings: choose default screen
 - terminologies: breakdown and count
 - ui: fix shadows on android
 - repo: release apk
