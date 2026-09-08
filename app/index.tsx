@@ -13,6 +13,7 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSettings } from '../hooks/useDenomination';
 import { AboutScreen } from '../screens/AboutScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ReceiptScreen } from '../screens/ReceiptScreen';
@@ -22,22 +23,36 @@ import { hardShadow } from '../utils/hardShadow';
 type TabKey = 'counter' | 'receipt' | 'settings' | 'about';
 
 export default function Index() {
+  const { defaultScreen, isLoaded } = useSettings();
   const [activeTab, setActiveTab] = useState<TabKey>('counter');
   const [showExitToast, setShowExitToast] = useState(false);
   const lastBackPressTimeRef = useRef<number>(0);
+  const hasInitializedTabRef = useRef<boolean>(false);
 
   const { width } = useWindowDimensions();
   const isWebDesktop = Platform.OS === 'web' && width > 768;
 
+  // On app startup, set activeTab to user-configured default startup screen
+  useEffect(() => {
+    if (isLoaded && !hasInitializedTabRef.current) {
+      hasInitializedTabRef.current = true;
+      if (defaultScreen === 'receipt' || defaultScreen === 'counter') {
+        setActiveTab(defaultScreen);
+      }
+    }
+  }, [isLoaded, defaultScreen]);
+
   useEffect(() => {
     const onBackPress = () => {
-      // If on other tab, navigate back to the home (counter) tab
-      if (activeTab !== 'counter') {
-        setActiveTab('counter');
+      const primaryHomeTab: TabKey = defaultScreen === 'receipt' ? 'receipt' : 'counter';
+
+      // If on other tab, navigate back to the primary home tab
+      if (activeTab !== primaryHomeTab) {
+        setActiveTab(primaryHomeTab);
         return true;
       }
 
-      // If already on home tab, handle double tap to exit
+      // If already on primary home tab, handle double tap to exit
       const now = Date.now();
       if (now - lastBackPressTimeRef.current < 2000) {
         BackHandler.exitApp();
@@ -56,10 +71,10 @@ export default function Index() {
 
     const backSubscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
     return () => backSubscription.remove();
-  }, [activeTab]);
+  }, [activeTab, defaultScreen]);
 
   const tabs: { key: TabKey; label: string; icon: keyof typeof Ionicons.glyphMap; color: string }[] = [
-    { key: 'counter', label: 'Payment', icon: 'calculator-outline', color: '#FACC15' },
+    { key: 'counter', label: 'Counter', icon: 'calculator-outline', color: '#FACC15' },
     { key: 'receipt', label: 'Receipt', icon: 'cash-outline', color: '#86EFAC' },
     { key: 'settings', label: 'Settings', icon: 'settings-outline', color: '#67E8F9' },
     { key: 'about', label: 'About', icon: 'heart-outline', color: '#FDA4AF' },

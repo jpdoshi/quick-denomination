@@ -18,6 +18,8 @@ export const SettingsScreen: React.FC = () => {
   const {
     currency,
     setCurrency,
+    defaultScreen,
+    setDefaultScreen,
     denominations,
     toggleDenomination,
     resetDenominations,
@@ -157,6 +159,105 @@ export const SettingsScreen: React.FC = () => {
             <Text style={styles.headerBadgeText}>PREFERENCES</Text>
           </View>
           <Text style={styles.headerTitle}>Settings</Text>
+        </View>
+
+        {/* Default Startup Screen Section */}
+        <View style={[styles.sectionCard, hardShadow(4)]}>
+          <View style={styles.sectionHeaderRow}>
+            <Ionicons name="phone-portrait-outline" size={20} color="#000" />
+            <Text style={styles.sectionTitle}>DEFAULT STARTUP SCREEN</Text>
+          </View>
+          <Text style={styles.sectionDescription}>
+            Choose which screen automatically opens when you launch the app.
+          </Text>
+
+          <View style={styles.startupOptionsGrid}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => setDefaultScreen('counter')}
+              style={[
+                styles.startupOptionCard,
+                defaultScreen === 'counter'
+                  ? styles.startupOptionCardActiveCounter
+                  : styles.startupOptionCardInactive,
+                hardShadow(defaultScreen === 'counter' ? 2.5 : 1.5),
+              ]}
+            >
+              <View style={styles.startupOptionLeft}>
+                <View
+                  style={[
+                    styles.startupOptionIconWrap,
+                    { backgroundColor: '#FACC15' },
+                    hardShadow(1.5),
+                  ]}
+                >
+                  <Ionicons name="calculator-outline" size={20} color="#000" />
+                </View>
+                <View style={styles.startupOptionMeta}>
+                  <View style={styles.startupOptionTitleRow}>
+                    <Text style={styles.startupOptionTitle}>Payment Screen</Text>
+                    {defaultScreen === 'counter' && (
+                      <View style={styles.defaultActivePill}>
+                        <Text style={styles.defaultActivePillText}>DEFAULT</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.startupOptionSubtitle}>
+                    Cashier counter & split dispenser
+                  </Text>
+                </View>
+              </View>
+
+              <Ionicons
+                name={defaultScreen === 'counter' ? 'radio-button-on' : 'radio-button-off'}
+                size={22}
+                color={defaultScreen === 'counter' ? '#000' : '#9CA3AF'}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => setDefaultScreen('receipt')}
+              style={[
+                styles.startupOptionCard,
+                defaultScreen === 'receipt'
+                  ? styles.startupOptionCardActiveReceipt
+                  : styles.startupOptionCardInactive,
+                hardShadow(defaultScreen === 'receipt' ? 2.5 : 1.5),
+              ]}
+            >
+              <View style={styles.startupOptionLeft}>
+                <View
+                  style={[
+                    styles.startupOptionIconWrap,
+                    { backgroundColor: '#86EFAC' },
+                    hardShadow(1.5),
+                  ]}
+                >
+                  <Ionicons name="cash-outline" size={20} color="#000" />
+                </View>
+                <View style={styles.startupOptionMeta}>
+                  <View style={styles.startupOptionTitleRow}>
+                    <Text style={styles.startupOptionTitle}>Receipt Screen</Text>
+                    {defaultScreen === 'receipt' && (
+                      <View style={[styles.defaultActivePill, { backgroundColor: '#065F46' }]}>
+                        <Text style={[styles.defaultActivePillText, { color: '#FFF' }]}>DEFAULT</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.startupOptionSubtitle}>
+                    Denomination breakdown & cash tally
+                  </Text>
+                </View>
+              </View>
+
+              <Ionicons
+                name={defaultScreen === 'receipt' ? 'radio-button-on' : 'radio-button-off'}
+                size={22}
+                color={defaultScreen === 'receipt' ? '#000' : '#9CA3AF'}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Currency Selector Section */}
@@ -1267,5 +1368,69 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#065F46',
     flex: 1,
+  },
+  startupOptionsGrid: {
+    gap: 10,
+  },
+  startupOptionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    borderRadius: 8,
+  },
+  startupOptionCardActiveCounter: {
+    backgroundColor: '#FEF9C3',
+  },
+  startupOptionCardActiveReceipt: {
+    backgroundColor: '#DCFCE7',
+  },
+  startupOptionCardInactive: {
+    backgroundColor: '#F9FAFB',
+  },
+  startupOptionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+    marginRight: 8,
+  },
+  startupOptionIconWrap: {
+    width: 38,
+    height: 38,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  startupOptionMeta: {
+    flex: 1,
+  },
+  startupOptionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  startupOptionTitle: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: '#000',
+  },
+  startupOptionSubtitle: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#4B5563',
+    marginTop: 2,
+  },
+  defaultActivePill: {
+    backgroundColor: '#000',
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 4,
+  },
+  defaultActivePillText: {
+    color: '#FFF',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.5,
   },
 });

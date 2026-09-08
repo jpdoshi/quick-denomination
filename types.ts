@@ -34,12 +34,15 @@ export const DEFAULT_SPLIT_PERCENTAGES: SplitPercentages = {
   100: 20,
 };
 
+export type DefaultScreen = 'counter' | 'receipt';
+
 export interface SettingsState {
   currency: CurrencyCode;
   denominations: DenominationItem[];
   showQuickAdd: boolean;
   splitEnabled: boolean;
   splitPercentages: SplitPercentages;
+  defaultScreen: DefaultScreen;
 }
 
 export const CURRENCY_CONFIGS: Record<CurrencyCode, CurrencyConfig> = {

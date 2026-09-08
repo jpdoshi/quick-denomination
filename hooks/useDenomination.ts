@@ -5,6 +5,7 @@ import {
   CurrencyCode,
   DEFAULT_DENOMINATIONS,
   DEFAULT_SPLIT_PERCENTAGES,
+  DefaultScreen,
   DenominationItem,
   SplitPercentages,
 } from '../types';
@@ -102,6 +103,8 @@ export function calculateBreakdown(
 interface SettingsContextType {
   currency: CurrencyCode;
   setCurrency: (currency: CurrencyCode) => void;
+  defaultScreen: DefaultScreen;
+  setDefaultScreen: (screen: DefaultScreen) => void;
   denominations: DenominationItem[];
   toggleDenomination: (value: number) => void;
   resetDenominations: () => void;
@@ -124,6 +127,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currency, setCurrencyState] = useState<CurrencyCode>('INR');
+  const [defaultScreen, setDefaultScreenState] = useState<DefaultScreen>('counter');
   const [denominations, setDenominations] = useState<DenominationItem[]>(DEFAULT_DENOMINATIONS);
   const [showQuickAdd, setShowQuickAddState] = useState<boolean>(true);
   const [splitEnabled, setSplitEnabledState] = useState<boolean>(false);
@@ -137,6 +141,9 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         if (stored) {
           const parsed = JSON.parse(stored);
           if (parsed.currency) setCurrencyState(parsed.currency);
+          if (parsed.defaultScreen === 'counter' || parsed.defaultScreen === 'receipt') {
+            setDefaultScreenState(parsed.defaultScreen);
+          }
           if (typeof parsed.showQuickAdd === 'boolean') {
             setShowQuickAddState(parsed.showQuickAdd);
           }
@@ -169,7 +176,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       newDenoms: DenominationItem[],
       newQuickAdd: boolean,
       newSplitEnabled: boolean,
-      newSplitPercentages: SplitPercentages
+      newSplitPercentages: SplitPercentages,
+      newDefaultScreen: DefaultScreen
     ) => {
       try {
         await AsyncStorage.setItem(
@@ -180,6 +188,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             showQuickAdd: newQuickAdd,
             splitEnabled: newSplitEnabled,
             splitPercentages: newSplitPercentages,
+            defaultScreen: newDefaultScreen,
           })
         );
       } catch (e) {
@@ -192,9 +201,17 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const setCurrency = useCallback(
     (newCurr: CurrencyCode) => {
       setCurrencyState(newCurr);
-      saveSettings(newCurr, denominations, showQuickAdd, splitEnabled, splitPercentages);
+      saveSettings(newCurr, denominations, showQuickAdd, splitEnabled, splitPercentages, defaultScreen);
     },
-    [denominations, showQuickAdd, splitEnabled, splitPercentages, saveSettings]
+    [denominations, showQuickAdd, splitEnabled, splitPercentages, defaultScreen, saveSettings]
+  );
+
+  const setDefaultScreen = useCallback(
+    (screen: DefaultScreen) => {
+      setDefaultScreenState(screen);
+      saveSettings(currency, denominations, showQuickAdd, splitEnabled, splitPercentages, screen);
+    },
+    [currency, denominations, showQuickAdd, splitEnabled, splitPercentages, saveSettings]
   );
 
   const toggleDenomination = useCallback(
@@ -203,69 +220,69 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const updated = prev.map((item) =>
           item.value === value ? { ...item, active: !item.active } : item
         );
-        saveSettings(currency, updated, showQuickAdd, splitEnabled, splitPercentages);
+        saveSettings(currency, updated, showQuickAdd, splitEnabled, splitPercentages, defaultScreen);
         return updated;
       });
     },
-    [currency, showQuickAdd, splitEnabled, splitPercentages, saveSettings]
+    [currency, showQuickAdd, splitEnabled, splitPercentages, defaultScreen, saveSettings]
   );
 
   const setShowQuickAdd = useCallback(
     (show: boolean) => {
       setShowQuickAddState(show);
-      saveSettings(currency, denominations, show, splitEnabled, splitPercentages);
+      saveSettings(currency, denominations, show, splitEnabled, splitPercentages, defaultScreen);
     },
-    [currency, denominations, splitEnabled, splitPercentages, saveSettings]
+    [currency, denominations, splitEnabled, splitPercentages, defaultScreen, saveSettings]
   );
 
   const toggleQuickAdd = useCallback(() => {
     setShowQuickAddState((prev) => {
       const next = !prev;
-      saveSettings(currency, denominations, next, splitEnabled, splitPercentages);
+      saveSettings(currency, denominations, next, splitEnabled, splitPercentages, defaultScreen);
       return next;
     });
-  }, [currency, denominations, splitEnabled, splitPercentages, saveSettings]);
+  }, [currency, denominations, splitEnabled, splitPercentages, defaultScreen, saveSettings]);
 
   const setSplitEnabled = useCallback(
     (enabled: boolean) => {
       setSplitEnabledState(enabled);
-      saveSettings(currency, denominations, showQuickAdd, enabled, splitPercentages);
+      saveSettings(currency, denominations, showQuickAdd, enabled, splitPercentages, defaultScreen);
     },
-    [currency, denominations, showQuickAdd, splitPercentages, saveSettings]
+    [currency, denominations, showQuickAdd, splitPercentages, defaultScreen, saveSettings]
   );
 
   const toggleSplitEnabled = useCallback(() => {
     setSplitEnabledState((prev) => {
       const next = !prev;
-      saveSettings(currency, denominations, showQuickAdd, next, splitPercentages);
+      saveSettings(currency, denominations, showQuickAdd, next, splitPercentages, defaultScreen);
       return next;
     });
-  }, [currency, denominations, showQuickAdd, splitPercentages, saveSettings]);
+  }, [currency, denominations, showQuickAdd, splitPercentages, defaultScreen, saveSettings]);
 
   const setDenominationPercentage = useCallback(
     (denomValue: number, percentage: number) => {
       setSplitPercentagesState((prev) => {
         const clamped = Math.min(100, Math.max(0, Math.round(percentage)));
         const updated = { ...prev, [denomValue]: clamped };
-        saveSettings(currency, denominations, showQuickAdd, splitEnabled, updated);
+        saveSettings(currency, denominations, showQuickAdd, splitEnabled, updated, defaultScreen);
         return updated;
       });
     },
-    [currency, denominations, showQuickAdd, splitEnabled, saveSettings]
+    [currency, denominations, showQuickAdd, splitEnabled, defaultScreen, saveSettings]
   );
 
   const setSplitPercentages = useCallback(
     (percentages: SplitPercentages) => {
       setSplitPercentagesState(percentages);
-      saveSettings(currency, denominations, showQuickAdd, splitEnabled, percentages);
+      saveSettings(currency, denominations, showQuickAdd, splitEnabled, percentages, defaultScreen);
     },
-    [currency, denominations, showQuickAdd, splitEnabled, saveSettings]
+    [currency, denominations, showQuickAdd, splitEnabled, defaultScreen, saveSettings]
   );
 
   const resetSplitPercentages = useCallback(() => {
     setSplitPercentagesState(DEFAULT_SPLIT_PERCENTAGES);
-    saveSettings(currency, denominations, showQuickAdd, splitEnabled, DEFAULT_SPLIT_PERCENTAGES);
-  }, [currency, denominations, showQuickAdd, splitEnabled, saveSettings]);
+    saveSettings(currency, denominations, showQuickAdd, splitEnabled, DEFAULT_SPLIT_PERCENTAGES, defaultScreen);
+  }, [currency, denominations, showQuickAdd, splitEnabled, defaultScreen, saveSettings]);
 
   const equalizeSplitPercentages = useCallback(() => {
     const active = denominations.filter((d) => d.active).map((d) => d.value);
@@ -280,8 +297,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
 
     setSplitPercentagesState(newPercentages);
-    saveSettings(currency, denominations, showQuickAdd, splitEnabled, newPercentages);
-  }, [currency, denominations, showQuickAdd, splitEnabled, saveSettings]);
+    saveSettings(currency, denominations, showQuickAdd, splitEnabled, newPercentages, defaultScreen);
+  }, [currency, denominations, showQuickAdd, splitEnabled, defaultScreen, saveSettings]);
 
   const resetDenominations = useCallback(() => {
     setDenominations(DEFAULT_DENOMINATIONS);
@@ -289,7 +306,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setShowQuickAddState(true);
     setSplitEnabledState(false);
     setSplitPercentagesState(DEFAULT_SPLIT_PERCENTAGES);
-    saveSettings('INR', DEFAULT_DENOMINATIONS, true, false, DEFAULT_SPLIT_PERCENTAGES);
+    setDefaultScreenState('counter');
+    saveSettings('INR', DEFAULT_DENOMINATIONS, true, false, DEFAULT_SPLIT_PERCENTAGES, 'counter');
   }, [saveSettings]);
 
   const activeNotes = useMemo(
@@ -301,6 +319,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     () => ({
       currency,
       setCurrency,
+      defaultScreen,
+      setDefaultScreen,
       denominations,
       toggleDenomination,
       resetDenominations,
@@ -321,6 +341,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [
       currency,
       setCurrency,
+      defaultScreen,
+      setDefaultScreen,
       denominations,
       toggleDenomination,
       resetDenominations,
