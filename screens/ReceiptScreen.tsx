@@ -108,7 +108,7 @@ export const ReceiptScreen: React.FC = () => {
         <View style={[styles.headerCard, hardShadow(4)]}>
           <View style={styles.headerLeft}>
             <View style={styles.headerBadge}>
-              <Text style={styles.headerBadgeText}>RECEIPT DESK</Text>
+              <Text style={styles.headerBadgeText}>RECEIPT DENOMINATION</Text>
             </View>
             <Text style={styles.headerTitle}>Cash Receipt Counter</Text>
           </View>
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '900',
     color: '#000',
     letterSpacing: -0.5,

@@ -195,7 +195,7 @@ export const SettingsScreen: React.FC = () => {
                 </View>
                 <View style={styles.startupOptionMeta}>
                   <View style={styles.startupOptionTitleRow}>
-                    <Text style={styles.startupOptionTitle}>Payment Screen</Text>
+                    <Text style={styles.startupOptionTitle}>Counter Screen</Text>
                     {defaultScreen === 'counter' && (
                       <View style={styles.defaultActivePill}>
                         <Text style={styles.defaultActivePillText}>DEFAULT</Text>

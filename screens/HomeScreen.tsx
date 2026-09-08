@@ -91,7 +91,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ isActive = true }) => {
         <View style={[styles.headerCard, hardShadow(4)]}>
           <View style={styles.headerLeft}>
             <View style={styles.headerBadge}>
-              <Text style={styles.headerBadgeText}>TELLER DESK</Text>
+              <Text style={styles.headerBadgeText}>CASH BREAKDOWN</Text>
             </View>
             <Text style={styles.headerTitle}>Cash Payment Counter</Text>
           </View>
