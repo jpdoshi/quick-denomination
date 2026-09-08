@@ -1,3 +1,4 @@
+import { hardShadow } from '@/utils/hardShadow';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -10,25 +11,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { CURRENCY_CONFIGS, formatCurrencyAmount } from './types';
-import { useSettings } from './useDenomination';
-
-const hardShadow = (offset = 3, bg = '#000') => ({
-  borderWidth: 2.5,
-  borderColor: '#000',
-  ...Platform.select({
-    web: {
-      boxShadow: `${offset}px ${offset}px 0px 0px ${bg}`,
-    },
-    default: {
-      shadowColor: bg,
-      shadowOffset: { width: offset, height: offset },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      elevation: 4,
-    },
-  }),
-});
+import { useSettings } from '../hooks/useDenomination';
+import { CURRENCY_CONFIGS, formatCurrencyAmount } from '../types';
 
 const NOTE_THEMES: Record<number, { bg: string; text: string; label: string }> = {
   2000: { bg: '#FBCFE8', text: '#831843', label: 'Pink Note' },

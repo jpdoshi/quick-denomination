@@ -10,33 +10,16 @@ import {
   ToastAndroid,
   TouchableOpacity,
   useWindowDimensions,
-  View,
-  ViewStyle,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AboutScreen } from '../AboutScreen';
-import { HomeScreen } from '../HomeScreen';
-import { ReceiptScreen } from '../ReceiptScreen';
-import { SettingsScreen } from '../SettingsScreen';
+import { AboutScreen } from '../screens/AboutScreen';
+import { HomeScreen } from '../screens/HomeScreen';
+import { ReceiptScreen } from '../screens/ReceiptScreen';
+import { SettingsScreen } from '../screens/SettingsScreen';
+import { hardShadow } from '../utils/hardShadow';
 
 type TabKey = 'counter' | 'receipt' | 'settings' | 'about';
-
-const hardShadow = (offset = 3, bg = '#000'): ViewStyle => ({
-  borderWidth: 2.5,
-  borderColor: '#000',
-  ...Platform.select({
-    web: {
-      boxShadow: `${offset}px ${offset}px 0px 0px ${bg}`,
-    } as any,
-    default: {
-      shadowColor: bg,
-      shadowOffset: { width: offset, height: offset },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      elevation: 4,
-    },
-  }),
-});
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState<TabKey>('counter');

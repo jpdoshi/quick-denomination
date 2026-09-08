@@ -1,33 +1,16 @@
+import { hardShadow } from '@/utils/hardShadow';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
-import { CURRENCY_CONFIGS, CurrencyCode } from './types';
-import { useSettings } from './useDenomination';
-
-const hardShadow = (offset = 3, bg = '#000') => ({
-  borderWidth: 2.5,
-  borderColor: '#000',
-  ...Platform.select({
-    web: {
-      boxShadow: `${offset}px ${offset}px 0px 0px ${bg}`,
-    },
-    default: {
-      shadowColor: bg,
-      shadowOffset: { width: offset, height: offset },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      elevation: 4,
-    },
-  }),
-});
+import { useSettings } from '../hooks/useDenomination';
+import { CURRENCY_CONFIGS, CurrencyCode } from '../types';
 
 const CURRENCIES: CurrencyCode[] = ['INR', 'USD', 'EUR', 'GBP'];
 

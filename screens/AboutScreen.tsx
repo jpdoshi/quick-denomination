@@ -3,30 +3,14 @@ import * as Clipboard from 'expo-clipboard';
 import React, { useState } from 'react';
 import {
   Linking,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
-const hardShadow = (offset = 3, bg = '#000') => ({
-  borderWidth: 2.5,
-  borderColor: '#000',
-  ...Platform.select({
-    web: {
-      boxShadow: `${offset}px ${offset}px 0px 0px ${bg}`,
-    },
-    default: {
-      shadowColor: bg,
-      shadowOffset: { width: offset, height: offset },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      elevation: 4,
-    },
-  }),
-});
+import { hardShadow } from '@/utils/hardShadow';
 
 const UPI_ID = 'jpdoshi2811@okaxis';
 const GITHUB_URL = 'https://github.com/jpdoshi/quick-denominator';
