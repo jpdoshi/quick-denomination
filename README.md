@@ -27,7 +27,5 @@ Quick Denomination is a free and open source app made to make cashiers' lives ea
 
 ## Todos
 
-- ui: fix shadows on android
-- repo: release apk
 - feat: share calculation and save history
 - testing: test cases
