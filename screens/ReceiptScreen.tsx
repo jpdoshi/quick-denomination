@@ -108,7 +108,7 @@ export const ReceiptScreen: React.FC = () => {
         <View style={[styles.headerCard, hardShadow(4)]}>
           <View style={styles.headerLeft}>
             <View style={styles.headerBadge}>
-              <Text style={styles.headerBadgeText}>RECEIPT DENOMINATION</Text>
+              <Text style={styles.headerBadgeText}>RECEIPT CALCULATOR</Text>
             </View>
             <Text style={styles.headerTitle}>Cash Receipt Counter</Text>
           </View>

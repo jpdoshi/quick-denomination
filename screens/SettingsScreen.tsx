@@ -2,6 +2,7 @@ import { hardShadow } from '@/utils/hardShadow';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  LayoutAnimation,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,7 +13,18 @@ import {
 import { useSettings } from '../hooks/useDenomination';
 import { CURRENCY_CONFIGS, CurrencyCode } from '../types';
 
+// if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+//   UIManager.setLayoutAnimationEnabledExperimental(true);
+// }
+
 const CURRENCIES: CurrencyCode[] = ['INR', 'USD', 'EUR', 'GBP'];
+
+type SettingsSectionKey =
+  | 'defaultScreen'
+  | 'currency'
+  | 'quickAdd'
+  | 'cashSplit'
+  | 'denominations';
 
 export const SettingsScreen: React.FC = () => {
   const {
@@ -47,6 +59,37 @@ export const SettingsScreen: React.FC = () => {
   );
 
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  // Collapsible section state
+  const [expandedSections, setExpandedSections] = useState<Record<SettingsSectionKey, boolean>>({
+    defaultScreen: true,
+    currency: true,
+    quickAdd: true,
+    cashSplit: true,
+    denominations: true,
+  });
+
+  const toggleSection = (key: SettingsSectionKey) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpandedSections((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const allExpanded = Object.values(expandedSections).every(Boolean);
+
+  const toggleAllSections = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    const nextState = !allExpanded;
+    setExpandedSections({
+      defaultScreen: nextState,
+      currency: nextState,
+      quickAdd: nextState,
+      cashSplit: nextState,
+      denominations: nextState,
+    });
+  };
 
   // Sync draft when splitPercentages from context updates
   useEffect(() => {
@@ -155,660 +198,782 @@ export const SettingsScreen: React.FC = () => {
       >
         {/* Header */}
         <View style={[styles.headerCard, hardShadow(4)]}>
-          <View style={styles.headerBadge}>
-            <Text style={styles.headerBadgeText}>PREFERENCES</Text>
+          <View style={styles.headerTopRow}>
+            <View style={styles.headerBadge}>
+              <Text style={styles.headerBadgeText}>PREFERENCES</Text>
+            </View>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={toggleAllSections}
+              style={[styles.expandAllBtn, hardShadow(1.5)]}
+            >
+              <Ionicons
+                name={allExpanded ? 'contract-outline' : 'expand-outline'}
+                size={13}
+                color="#000"
+              />
+              <Text style={styles.expandAllBtnText}>
+                {allExpanded ? 'COLLAPSE ALL' : 'EXPAND ALL'}
+              </Text>
+            </TouchableOpacity>
           </View>
           <Text style={styles.headerTitle}>Settings</Text>
         </View>
 
         {/* Default Startup Screen Section */}
-        <View style={[styles.sectionCard, hardShadow(4)]}>
-          <View style={styles.sectionHeaderRow}>
-            <Ionicons name="phone-portrait-outline" size={20} color="#000" />
-            <Text style={styles.sectionTitle}>DEFAULT STARTUP SCREEN</Text>
-          </View>
-          <Text style={styles.sectionDescription}>
-            Choose which screen automatically opens when you launch the app.
-          </Text>
+        <View style={[styles.sectionCard, styles.sectionCardDefaultScreen, hardShadow(4)]}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => toggleSection('defaultScreen')}
+            style={styles.sectionHeaderTouchable}
+          >
+            <View style={styles.sectionHeaderLeft}>
+              <View style={styles.sectionIconWrap}>
+                <Ionicons name="phone-portrait-outline" size={17} color="#000" />
+              </View>
+              <Text style={styles.sectionTitle}>DEFAULT SCREEN</Text>
+            </View>
 
-          <View style={styles.startupOptionsGrid}>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => setDefaultScreen('counter')}
-              style={[
-                styles.startupOptionCard,
-                defaultScreen === 'counter'
-                  ? styles.startupOptionCardActiveCounter
-                  : styles.startupOptionCardInactive,
-                hardShadow(defaultScreen === 'counter' ? 2.5 : 1.5),
-              ]}
-            >
-              <View style={styles.startupOptionLeft}>
-                <View
+            <View style={styles.sectionHeaderRight}>
+              <View style={styles.chevronBox}>
+                <Ionicons
+                  name={expandedSections.defaultScreen ? 'chevron-up' : 'chevron-down'}
+                  size={15}
+                  color="#FFF"
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          {expandedSections.defaultScreen && (
+            <View style={styles.sectionContent}>
+              <View style={styles.startupOptionsGrid}>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={() => setDefaultScreen('counter')}
                   style={[
-                    styles.startupOptionIconWrap,
-                    { backgroundColor: '#FACC15' },
-                    hardShadow(1.5),
+                    styles.startupOptionCard,
+                    defaultScreen === 'counter'
+                      ? styles.startupOptionCardActiveCounter
+                      : styles.startupOptionCardInactive,
+                    hardShadow(defaultScreen === 'counter' ? 2.5 : 1.5),
                   ]}
                 >
-                  <Ionicons name="calculator-outline" size={20} color="#000" />
-                </View>
-                <View style={styles.startupOptionMeta}>
-                  <View style={styles.startupOptionTitleRow}>
-                    <Text style={styles.startupOptionTitle}>Counter Screen</Text>
-                    {defaultScreen === 'counter' && (
-                      <View style={styles.defaultActivePill}>
-                        <Text style={styles.defaultActivePillText}>DEFAULT</Text>
+                  <View style={styles.startupOptionLeft}>
+                    <View
+                      style={[
+                        styles.startupOptionIconWrap,
+                        { backgroundColor: '#FACC15' },
+                        hardShadow(1.5),
+                      ]}
+                    >
+                      <Ionicons name="calculator-outline" size={20} color="#000" />
+                    </View>
+                    <View style={styles.startupOptionMeta}>
+                      <View style={styles.startupOptionTitleRow}>
+                        <Text style={styles.startupOptionTitle}>Counter Screen</Text>
+                        {defaultScreen === 'counter' && (
+                          <View style={styles.defaultActivePill}>
+                            <Text style={styles.defaultActivePillText}>DEFAULT</Text>
+                          </View>
+                        )}
                       </View>
-                    )}
+                      <Text style={styles.startupOptionSubtitle}>
+                        Cashier counter & split dispenser
+                      </Text>
+                    </View>
                   </View>
-                  <Text style={styles.startupOptionSubtitle}>
-                    Cashier counter & split dispenser
-                  </Text>
-                </View>
-              </View>
 
-              <Ionicons
-                name={defaultScreen === 'counter' ? 'radio-button-on' : 'radio-button-off'}
-                size={22}
-                color={defaultScreen === 'counter' ? '#000' : '#9CA3AF'}
-              />
-            </TouchableOpacity>
+                  <Ionicons
+                    name={defaultScreen === 'counter' ? 'radio-button-on' : 'radio-button-off'}
+                    size={22}
+                    color={defaultScreen === 'counter' ? '#000' : '#9CA3AF'}
+                  />
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => setDefaultScreen('receipt')}
-              style={[
-                styles.startupOptionCard,
-                defaultScreen === 'receipt'
-                  ? styles.startupOptionCardActiveReceipt
-                  : styles.startupOptionCardInactive,
-                hardShadow(defaultScreen === 'receipt' ? 2.5 : 1.5),
-              ]}
-            >
-              <View style={styles.startupOptionLeft}>
-                <View
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={() => setDefaultScreen('receipt')}
                   style={[
-                    styles.startupOptionIconWrap,
-                    { backgroundColor: '#86EFAC' },
-                    hardShadow(1.5),
+                    styles.startupOptionCard,
+                    defaultScreen === 'receipt'
+                      ? styles.startupOptionCardActiveReceipt
+                      : styles.startupOptionCardInactive,
+                    hardShadow(defaultScreen === 'receipt' ? 2.5 : 1.5),
                   ]}
                 >
-                  <Ionicons name="cash-outline" size={20} color="#000" />
-                </View>
-                <View style={styles.startupOptionMeta}>
-                  <View style={styles.startupOptionTitleRow}>
-                    <Text style={styles.startupOptionTitle}>Receipt Screen</Text>
-                    {defaultScreen === 'receipt' && (
-                      <View style={[styles.defaultActivePill, { backgroundColor: '#065F46' }]}>
-                        <Text style={[styles.defaultActivePillText, { color: '#FFF' }]}>DEFAULT</Text>
+                  <View style={styles.startupOptionLeft}>
+                    <View
+                      style={[
+                        styles.startupOptionIconWrap,
+                        { backgroundColor: '#86EFAC' },
+                        hardShadow(1.5),
+                      ]}
+                    >
+                      <Ionicons name="cash-outline" size={20} color="#000" />
+                    </View>
+                    <View style={styles.startupOptionMeta}>
+                      <View style={styles.startupOptionTitleRow}>
+                        <Text style={styles.startupOptionTitle}>Receipt Screen</Text>
+                        {defaultScreen === 'receipt' && (
+                          <View style={[styles.defaultActivePill, { backgroundColor: '#065F46' }]}>
+                            <Text style={[styles.defaultActivePillText, { color: '#FFF' }]}>DEFAULT</Text>
+                          </View>
+                        )}
                       </View>
-                    )}
+                      <Text style={styles.startupOptionSubtitle}>
+                        Denomination breakdown & cash tally
+                      </Text>
+                    </View>
                   </View>
-                  <Text style={styles.startupOptionSubtitle}>
-                    Denomination breakdown & cash tally
-                  </Text>
-                </View>
-              </View>
 
-              <Ionicons
-                name={defaultScreen === 'receipt' ? 'radio-button-on' : 'radio-button-off'}
-                size={22}
-                color={defaultScreen === 'receipt' ? '#000' : '#9CA3AF'}
-              />
-            </TouchableOpacity>
-          </View>
+                  <Ionicons
+                    name={defaultScreen === 'receipt' ? 'radio-button-on' : 'radio-button-off'}
+                    size={22}
+                    color={defaultScreen === 'receipt' ? '#000' : '#9CA3AF'}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </View>
 
         {/* Currency Selector Section */}
-        <View style={[styles.sectionCard, hardShadow(4)]}>
-          <View style={styles.sectionHeaderRow}>
-            <Ionicons name="cash-outline" size={20} color="#000" />
-            <Text style={styles.sectionTitle}>CURRENCY SYSTEM</Text>
-          </View>
+        <View style={[styles.sectionCard, styles.sectionCardCurrency, hardShadow(4)]}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => toggleSection('currency')}
+            style={styles.sectionHeaderTouchable}
+          >
+            <View style={styles.sectionHeaderLeft}>
+              <View style={styles.sectionIconWrap}>
+                <Ionicons name="cash-outline" size={17} color="#000" />
+              </View>
+              <Text style={styles.sectionTitle}>CHOOSE CURRENCY</Text>
+            </View>
 
-          <View style={styles.currencyChipsGrid}>
-            {CURRENCIES.map((code) => {
-              const cfg = CURRENCY_CONFIGS[code];
-              const isSelected = currency === code;
+            <View style={styles.sectionHeaderRight}>
+              <View style={styles.chevronBox}>
+                <Ionicons
+                  name={expandedSections.currency ? 'chevron-up' : 'chevron-down'}
+                  size={15}
+                  color="#FFF"
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
 
-              return (
-                <TouchableOpacity
-                  key={code}
-                  activeOpacity={0.8}
-                  onPress={() => setCurrency(code)}
-                  style={[
-                    styles.currencyChip,
-                    isSelected ? styles.currencyChipSelected : styles.currencyChipUnselected,
-                    hardShadow(isSelected ? 3 : 2),
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.currencySymbol,
-                      isSelected ? styles.currencySymbolSelected : styles.currencySymbolUnselected,
-                    ]}
-                  >
-                    {cfg.symbol}
-                  </Text>
-                  <View>
-                    <Text
+          {expandedSections.currency && (
+            <View style={styles.sectionContent}>
+              <View style={styles.currencyChipsGrid}>
+                {CURRENCIES.map((code) => {
+                  const cfg = CURRENCY_CONFIGS[code];
+                  const isSelected = currency === code;
+
+                  return (
+                    <TouchableOpacity
+                      key={code}
+                      activeOpacity={0.8}
+                      onPress={() => setCurrency(code)}
                       style={[
-                        styles.currencyCode,
-                        isSelected ? styles.currencyCodeSelected : styles.currencyCodeUnselected,
+                        styles.currencyChip,
+                        isSelected ? styles.currencyChipSelected : styles.currencyChipUnselected,
+                        hardShadow(isSelected ? 3 : 2),
                       ]}
                     >
-                      {cfg.code}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.currencyName,
-                        isSelected ? styles.currencyNameSelected : styles.currencyNameUnselected,
-                      ]}
-                    >
-                      {cfg.name}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+                      <Text
+                        style={[
+                          styles.currencySymbol,
+                          isSelected ? styles.currencySymbolSelected : styles.currencySymbolUnselected,
+                        ]}
+                      >
+                        {cfg.symbol}
+                      </Text>
+                      <View>
+                        <Text
+                          style={[
+                            styles.currencyCode,
+                            isSelected ? styles.currencyCodeSelected : styles.currencyCodeUnselected,
+                          ]}
+                        >
+                          {cfg.code}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.currencyName,
+                            isSelected ? styles.currencyNameSelected : styles.currencyNameUnselected,
+                          ]}
+                        >
+                          {cfg.name}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          )}
         </View>
 
         {/* Quick Add Presets Feature */}
-        <View style={[styles.sectionCard, hardShadow(4)]}>
-          <View style={styles.sectionHeaderRow}>
-            <Ionicons name="flash-outline" size={20} color="#000" />
-            <Text style={styles.sectionTitle}>QUICK-ADD PRESETS</Text>
-          </View>
-
-          <View
-            style={[
-              styles.denomRow,
-              showQuickAdd ? styles.denomRowActive : styles.denomRowInactive,
-              hardShadow(2),
-            ]}
+        <View style={[styles.sectionCard, styles.sectionCardQuickAdd, hardShadow(4)]}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => toggleSection('quickAdd')}
+            style={styles.sectionHeaderTouchable}
           >
-            <View style={styles.denomLeft}>
-              <View style={styles.denomMeta}>
-                <Text style={styles.denomLabel}>Quick Add Buttons</Text>
-                <Text style={styles.denomSubLabelText}>
-                  {showQuickAdd ? 'Visible on Cashier Counter' : 'Hidden from Cashier Counter'}
-                </Text>
+            <View style={styles.sectionHeaderLeft}>
+              <View style={styles.sectionIconWrap}>
+                <Ionicons name="flash-outline" size={17} color="#000" />
               </View>
+              <Text style={styles.sectionTitle}>QUICK-ADD PRESETS</Text>
             </View>
 
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={toggleQuickAdd}
-              style={[
-                styles.toggleButton,
-                showQuickAdd ? styles.toggleButtonOn : styles.toggleButtonOff,
-                hardShadow(1.5),
-              ]}
-            >
+            <View style={styles.sectionHeaderRight}>
+              <View style={styles.chevronBox}>
+                <Ionicons
+                  name={expandedSections.quickAdd ? 'chevron-up' : 'chevron-down'}
+                  size={15}
+                  color="#FFF"
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          {expandedSections.quickAdd && (
+            <View style={styles.sectionContent}>
               <View
                 style={[
-                  styles.toggleThumb,
-                  showQuickAdd ? styles.toggleThumbOn : styles.toggleThumbOff,
-                ]}
-              />
-              <Text
-                style={[
-                  styles.toggleText,
-                  showQuickAdd ? styles.toggleTextOn : styles.toggleTextOff,
+                  styles.denomRow,
+                  showQuickAdd ? styles.denomRowActive : styles.denomRowInactive,
+                  hardShadow(2),
                 ]}
               >
-                {showQuickAdd ? 'ACTIVE' : 'OFF'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <View style={styles.denomLeft}>
+                  <View style={styles.denomMeta}>
+                    <Text style={styles.denomLabel}>Quick Add Buttons</Text>
+                    <Text style={styles.denomSubLabelText}>
+                      {showQuickAdd ? 'Visible on Cashier Counter' : 'Hidden from Cashier Counter'}
+                    </Text>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={toggleQuickAdd}
+                  style={[
+                    styles.toggleButton,
+                    showQuickAdd ? styles.toggleButtonOn : styles.toggleButtonOff,
+                    hardShadow(1.5),
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.toggleThumb,
+                      showQuickAdd ? styles.toggleThumbOn : styles.toggleThumbOff,
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.toggleText,
+                      showQuickAdd ? styles.toggleTextOn : styles.toggleTextOff,
+                    ]}
+                  >
+                    {showQuickAdd ? 'ACTIVE' : 'OFF'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </View>
 
         {/* Percentage Split Section */}
-        <View style={[styles.sectionCard, hardShadow(4)]}>
-          <View style={styles.sectionHeaderRow}>
-            <Ionicons name="pie-chart-outline" size={20} color="#000" />
-            <Text style={styles.sectionTitle}>PERCENTAGE SPLIT CONFIGURATION</Text>
-          </View>
-
-          {/* Master Split Feature Toggle */}
-          <View
-            style={[
-              styles.denomRow,
-              splitEnabled ? styles.denomRowActive : styles.denomRowInactive,
-              hardShadow(2),
-              { marginBottom: 14 },
-            ]}
+        <View style={[styles.sectionCard, styles.sectionCardCashSplit, hardShadow(4)]}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => toggleSection('cashSplit')}
+            style={styles.sectionHeaderTouchable}
           >
-            <View style={styles.denomLeft}>
-              <View style={styles.denomMeta}>
-                <Text style={styles.denomLabel}>Split Dispense Feature</Text>
-                <Text style={styles.denomSubLabelText}>
-                  {splitEnabled ? 'Split Denomination' : 'Standard denomination'}
-                </Text>
+            <View style={styles.sectionHeaderLeft}>
+              <View style={styles.sectionIconWrap}>
+                <Ionicons name="pie-chart-outline" size={17} color="#000" />
               </View>
+              <Text style={styles.sectionTitle}>CASH SPLIT CONFIGURATION</Text>
             </View>
 
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={toggleSplitEnabled}
-              style={[
-                styles.toggleButton,
-                splitEnabled ? styles.toggleButtonOn : styles.toggleButtonOff,
-                hardShadow(1.5),
-              ]}
-            >
+            <View style={styles.sectionHeaderRight}>
+              <View style={styles.chevronBox}>
+                <Ionicons
+                  name={expandedSections.cashSplit ? 'chevron-up' : 'chevron-down'}
+                  size={15}
+                  color="#FFF"
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          {expandedSections.cashSplit && (
+            <View style={styles.sectionContent}>
+
+              {/* Master Split Feature Toggle */}
               <View
                 style={[
-                  styles.toggleThumb,
-                  splitEnabled ? styles.toggleThumbOn : styles.toggleThumbOff,
-                ]}
-              />
-              <Text
-                style={[
-                  styles.toggleText,
-                  splitEnabled ? styles.toggleTextOn : styles.toggleTextOff,
+                  styles.denomRow,
+                  splitEnabled ? styles.denomRowActive : styles.denomRowInactive,
+                  hardShadow(2),
+                  { marginBottom: 14 },
                 ]}
               >
-                {splitEnabled ? 'ACTIVE' : 'OFF'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <View style={styles.denomLeft}>
+                  <View style={styles.denomMeta}>
+                    <Text style={styles.denomLabel}>Split Dispense Feature</Text>
+                    <Text style={styles.denomSubLabelText}>
+                      {splitEnabled ? 'Split Denomination' : 'Standard denomination'}
+                    </Text>
+                  </View>
+                </View>
 
-          {/* Step 1: Check buttons for notes */}
-          <View style={styles.splitSubSection}>
-            <View style={styles.splitStepHeader}>
-              <View style={styles.stepNumberBadge}>
-                <Text style={styles.stepNumberText}>1</Text>
-              </View>
-              <View style={styles.stepHeaderTextGroup}>
-                <Text style={styles.stepTitle}>SELECT NOTES TO SPLIT</Text>
-              </View>
-            </View>
-
-            <View style={styles.checkButtonsGrid}>
-              {activeDenominations.map((denom) => {
-                const isSelected = selectedNotes.includes(denom.value);
-                return (
-                  <TouchableOpacity
-                    key={denom.value}
-                    activeOpacity={0.8}
-                    onPress={() => toggleNoteSelection(denom.value)}
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={toggleSplitEnabled}
+                  style={[
+                    styles.toggleButton,
+                    splitEnabled ? styles.toggleButtonOn : styles.toggleButtonOff,
+                    hardShadow(1.5),
+                  ]}
+                >
+                  <View
                     style={[
-                      styles.checkButton,
-                      isSelected ? styles.checkButtonSelected : styles.checkButtonUnselected,
-                      hardShadow(isSelected ? 2 : 1),
+                      styles.toggleThumb,
+                      splitEnabled ? styles.toggleThumbOn : styles.toggleThumbOff,
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.toggleText,
+                      splitEnabled ? styles.toggleTextOn : styles.toggleTextOff,
                     ]}
                   >
-                    <Ionicons
-                      name={isSelected ? 'checkbox' : 'square-outline'}
-                      size={18}
-                      color={isSelected ? '#000' : '#4B5563'}
-                    />
+                    {splitEnabled ? 'ACTIVE' : 'OFF'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Step 1: Check buttons for notes */}
+              <View style={styles.splitSubSection}>
+                <View style={styles.splitStepHeader}>
+                  <View style={styles.stepNumberBadge}>
+                    <Text style={styles.stepNumberText}>1</Text>
+                  </View>
+                  <View style={styles.stepHeaderTextGroup}>
+                    <Text style={styles.stepTitle}>SELECT NOTES TO SPLIT</Text>
+                  </View>
+                </View>
+
+                <View style={styles.checkButtonsGrid}>
+                  {activeDenominations.map((denom) => {
+                    const isSelected = selectedNotes.includes(denom.value);
+                    return (
+                      <TouchableOpacity
+                        key={denom.value}
+                        activeOpacity={0.8}
+                        onPress={() => toggleNoteSelection(denom.value)}
+                        style={[
+                          styles.checkButton,
+                          isSelected ? styles.checkButtonSelected : styles.checkButtonUnselected,
+                          hardShadow(isSelected ? 2 : 1),
+                        ]}
+                      >
+                        <Ionicons
+                          name={isSelected ? 'checkbox' : 'square-outline'}
+                          size={18}
+                          color={isSelected ? '#000' : '#4B5563'}
+                        />
+                        <Text
+                          style={[
+                            styles.checkButtonText,
+                            isSelected ? styles.checkButtonTextSelected : styles.checkButtonTextUnselected,
+                          ]}
+                        >
+                          {CURRENCY_CONFIGS[currency]?.symbol || '₹'}{denom.value}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+
+              {/* Step 2: Configure percentages for selected notes */}
+              <View style={styles.splitSubSection}>
+                <View style={styles.splitStepHeader}>
+                  <View style={styles.stepNumberBadge}>
+                    <Text style={styles.stepNumberText}>2</Text>
+                  </View>
+                  <View style={styles.stepHeaderTextGroup}>
+                    <Text style={styles.stepTitle}>ADJUST NOTE PERCENTAGES</Text>
+                  </View>
+                </View>
+
+                {selectedNotes.length === 0 ? (
+                  <View style={[styles.emptySelectedCard, hardShadow(1.5)]}>
+                    <Ionicons name="checkbox-outline" size={24} color="#6B7280" />
+                    <Text style={styles.emptySelectedTitle}>No Notes Selected</Text>
+                    <Text style={styles.emptySelectedText}>
+                      Check at least one note in Step 1 above to configure its percentage.
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={styles.sliderCardsList}>
+                    {selectedNotes.map((denomVal) => {
+                      const denomItem = activeDenominations.find((d) => d.value === denomVal);
+                      const pct = draftPercentages[denomVal] || 0;
+
+                      return (
+                        <View
+                          key={denomVal}
+                          style={[styles.sliderCard, hardShadow(2)]}
+                        >
+                          <View style={styles.sliderCardHeader}>
+                            <View style={styles.sliderCardLeft}>
+                              <View
+                                style={[
+                                  styles.denomBadge,
+                                  { backgroundColor: '#FACC15' },
+                                  hardShadow(1.5),
+                                ]}
+                              >
+                                <Text style={styles.denomBadgeText}>
+                                  {CURRENCY_CONFIGS[currency]?.symbol || '₹'}
+                                  {denomVal}
+                                </Text>
+                              </View>
+                              <Text style={styles.sliderNoteLabel} numberOfLines={1}>
+                                {denomItem?.label || `${CURRENCY_CONFIGS[currency]?.symbol}${denomVal} Note`}
+                              </Text>
+                            </View>
+
+                            <View style={styles.percentControlRow}>
+                              <TouchableOpacity
+                                activeOpacity={0.7}
+                                onPress={() => adjustDraftPercentage(denomVal, -1)}
+                                style={[styles.stepperMiniBtn, hardShadow(1)]}
+                              >
+                                <Ionicons name="remove" size={16} color="#000" />
+                              </TouchableOpacity>
+
+                              <View style={[styles.percentInputBox, hardShadow(1.5)]}>
+                                <TextInput
+                                  value={pct > 0 ? pct.toString() : '0'}
+                                  onChangeText={(text) => {
+                                    const cleaned = text.replace(/[^0-9]/g, '');
+                                    const val = cleaned ? parseInt(cleaned, 10) : 0;
+                                    updateDraftPercentage(denomVal, val);
+                                  }}
+                                  keyboardType="number-pad"
+                                  maxLength={3}
+                                  style={styles.percentTextInput}
+                                  selectTextOnFocus
+                                />
+                                <Text style={styles.percentSuffixText}>%</Text>
+                              </View>
+
+                              <TouchableOpacity
+                                activeOpacity={0.7}
+                                onPress={() => adjustDraftPercentage(denomVal, 1)}
+                                style={[styles.stepperMiniBtn, hardShadow(1)]}
+                              >
+                                <Ionicons name="add" size={16} color="#000" />
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+
+                          {/* Visual Progress Fill Bar */}
+                          <View style={styles.noteProgressTrack}>
+                            <View
+                              style={[
+                                styles.noteProgressFill,
+                                {
+                                  width: `${Math.min(100, Math.max(0, pct))}%`,
+                                  backgroundColor: pct > 0 ? '#FACC15' : '#E5E7EB',
+                                },
+                              ]}
+                            />
+                          </View>
+                        </View>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+
+              {/* Step 3: Preset Validation & Save */}
+              <View style={styles.splitSubSection}>
+                <View style={styles.splitStepHeader}>
+                  <View style={styles.stepNumberBadge}>
+                    <Text style={styles.stepNumberText}>3</Text>
+                  </View>
+                  <View style={styles.stepHeaderTextGroup}>
+                    <Text style={styles.stepTitle}>VALIDATE & SAVE PRESET</Text>
+                  </View>
+                </View>
+
+                {/* Validation Banner */}
+                <View
+                  style={[
+                    styles.validationBanner,
+                    isExact100
+                      ? styles.validationBannerGreen
+                      : totalPercentage < 100
+                        ? styles.validationBannerAmber
+                        : styles.validationBannerRed,
+                    hardShadow(2),
+                  ]}
+                >
+                  <Ionicons
+                    name={
+                      isExact100
+                        ? 'checkmark-circle'
+                        : totalPercentage < 100
+                          ? 'warning'
+                          : 'alert-circle'
+                    }
+                    size={22}
+                    color={
+                      isExact100
+                        ? '#065F46'
+                        : totalPercentage < 100
+                          ? '#92400E'
+                          : '#991B1B'
+                    }
+                  />
+                  <View style={styles.validationTextGroup}>
                     <Text
                       style={[
-                        styles.checkButtonText,
-                        isSelected ? styles.checkButtonTextSelected : styles.checkButtonTextUnselected,
+                        styles.validationTitle,
+                        isExact100
+                          ? styles.validationTitleGreen
+                          : totalPercentage < 100
+                            ? styles.validationTitleAmber
+                            : styles.validationTitleRed,
                       ]}
                     >
-                      {CURRENCY_CONFIGS[currency]?.symbol || '₹'}{denom.value}
+                      {isExact100
+                        ? 'TOTAL: 100% (BALANCED)'
+                        : totalPercentage < 100
+                          ? `TOTAL: ${totalPercentage}% (${100 - totalPercentage}% SHORT OF 100%)`
+                          : `TOTAL: ${totalPercentage}% (EXCEEDS 100% BY ${totalPercentage - 100}%)`}
                     </Text>
+                    <Text
+                      style={[
+                        styles.validationSubtitle,
+                        isExact100
+                          ? styles.validationSubtitleGreen
+                          : totalPercentage < 100
+                            ? styles.validationSubtitleAmber
+                            : styles.validationSubtitleRed,
+                      ]}
+                    >
+                      {isExact100
+                        ? 'Preset is perfectly balanced! Tap Save Split Preset below.'
+                        : totalPercentage < 100
+                          ? 'Cannot save: total must not be less than 100%. Tap "Auto-Balance" or adjust sliders.'
+                          : 'Cannot save: total must not exceed 100%. Reduce sliders or tap "Auto-Balance".'}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Allocation Progress Bar */}
+                <View style={[styles.progressBarTrack, { marginBottom: 12 }]}>
+                  <View
+                    style={[
+                      styles.progressBarFill,
+                      {
+                        width: `${Math.min(100, totalPercentage)}%`,
+                        backgroundColor: isExact100
+                          ? '#10B981'
+                          : totalPercentage < 100
+                            ? '#F59E0B'
+                            : '#EF4444',
+                      },
+                    ]}
+                  />
+                </View>
+
+                {/* Quick Helper Tools */}
+                <View style={styles.presetButtonsRow}>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={handleAutoBalance}
+                    style={[styles.splitPresetBtn, { backgroundColor: '#BAE6FD' }, hardShadow(1.5)]}
+                  >
+                    <Text style={styles.splitPresetBtnText}>Auto-Balance</Text>
                   </TouchableOpacity>
-                );
-              })}
+
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={handleApplyBankPreset}
+                    style={[styles.splitPresetBtn, { backgroundColor: '#FDE047' }, hardShadow(1.5)]}
+                  >
+                    <Text style={styles.splitPresetBtnText}>50/30/20 Bank</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={handleResetToSaved}
+                    style={[styles.splitPresetBtn, { backgroundColor: '#F3F4F6' }, hardShadow(1.5)]}
+                  >
+                    <Text style={styles.splitPresetBtnText}>Reset</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Save Preset Button */}
+                <TouchableOpacity
+                  activeOpacity={isExact100 ? 0.8 : 1}
+                  onPress={handleSavePreset}
+                  disabled={!isExact100}
+                  style={[
+                    styles.savePresetButton,
+                    isExact100 ? styles.savePresetButtonActive : styles.savePresetButtonDisabled,
+                    isExact100 && hardShadow(3),
+                  ]}
+                >
+                  <Ionicons
+                    name={isExact100 ? 'checkmark-circle' : 'lock-closed-outline'}
+                    size={20}
+                    color={isExact100 ? '#000' : '#6B7280'}
+                  />
+                  <Text
+                    style={[
+                      styles.savePresetButtonText,
+                      isExact100
+                        ? styles.savePresetButtonTextActive
+                        : styles.savePresetButtonTextDisabled,
+                    ]}
+                  >
+                    {isExact100
+                      ? 'SAVE SPLIT PRESET'
+                      : `CANNOT SAVE (TOTAL ${totalPercentage}%, MUST BE 100%)`}
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Save Success Alert */}
+                {savedSuccess && (
+                  <View style={[styles.savedSuccessCard, hardShadow(2)]}>
+                    <Ionicons name="checkmark-done-circle" size={20} color="#065F46" />
+                    <Text style={styles.savedSuccessText}>
+                      Split preset saved successfully! Active on Cashier counter.
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
-          </View>
+          )}
+        </View>
 
-          {/* Step 2: Configure percentages for selected notes */}
-          <View style={styles.splitSubSection}>
-            <View style={styles.splitStepHeader}>
-              <View style={styles.stepNumberBadge}>
-                <Text style={styles.stepNumberText}>2</Text>
+        {/* Denomination Manager Section */}
+        <View style={[styles.sectionCard, styles.sectionCardDenominations, hardShadow(4)]}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => toggleSection('denominations')}
+            style={styles.sectionHeaderTouchable}
+          >
+            <View style={styles.sectionHeaderLeft}>
+              <View style={styles.sectionIconWrap}>
+                <Ionicons name="list-circle-outline" size={19} color="#000" />
               </View>
-              <View style={styles.stepHeaderTextGroup}>
-                <Text style={styles.stepTitle}>ADJUST NOTE PERCENTAGES</Text>
-              </View>
+              <Text style={styles.sectionTitle}>DENOMINATION MANAGER</Text>
             </View>
 
-            {selectedNotes.length === 0 ? (
-              <View style={[styles.emptySelectedCard, hardShadow(1.5)]}>
-                <Ionicons name="checkbox-outline" size={24} color="#6B7280" />
-                <Text style={styles.emptySelectedTitle}>No Notes Selected</Text>
-                <Text style={styles.emptySelectedText}>
-                  Check at least one note in Step 1 above to configure its percentage.
-                </Text>
+            <View style={styles.sectionHeaderRight}>
+              <View style={styles.chevronBox}>
+                <Ionicons
+                  name={expandedSections.denominations ? 'chevron-up' : 'chevron-down'}
+                  size={15}
+                  color="#FFF"
+                />
               </View>
-            ) : (
-              <View style={styles.sliderCardsList}>
-                {selectedNotes.map((denomVal) => {
-                  const denomItem = activeDenominations.find((d) => d.value === denomVal);
-                  const pct = draftPercentages[denomVal] || 0;
+            </View>
+          </TouchableOpacity>
 
+          {expandedSections.denominations && (
+            <View style={styles.sectionContent}>
+
+              <View style={styles.denominationsList}>
+                {denominations.map((denom) => {
+                  const is2000 = denom.value === 2000;
                   return (
                     <View
-                      key={denomVal}
-                      style={[styles.sliderCard, hardShadow(2)]}
+                      key={denom.value}
+                      style={[
+                        styles.denomRow,
+                        denom.active ? styles.denomRowActive : styles.denomRowInactive,
+                        hardShadow(2),
+                      ]}
                     >
-                      <View style={styles.sliderCardHeader}>
-                        <View style={styles.sliderCardLeft}>
-                          <View
-                            style={[
-                              styles.denomBadge,
-                              { backgroundColor: '#FACC15' },
-                              hardShadow(1.5),
-                            ]}
-                          >
-                            <Text style={styles.denomBadgeText}>
-                              {CURRENCY_CONFIGS[currency]?.symbol || '₹'}
-                              {denomVal}
-                            </Text>
-                          </View>
-                          <Text style={styles.sliderNoteLabel} numberOfLines={1}>
-                            {denomItem?.label || `${CURRENCY_CONFIGS[currency]?.symbol}${denomVal} Note`}
-                          </Text>
-                        </View>
-
-                        <View style={styles.percentControlRow}>
-                          <TouchableOpacity
-                            activeOpacity={0.7}
-                            onPress={() => adjustDraftPercentage(denomVal, -1)}
-                            style={[styles.stepperMiniBtn, hardShadow(1)]}
-                          >
-                            <Ionicons name="remove" size={16} color="#000" />
-                          </TouchableOpacity>
-
-                          <View style={[styles.percentInputBox, hardShadow(1.5)]}>
-                            <TextInput
-                              value={pct > 0 ? pct.toString() : '0'}
-                              onChangeText={(text) => {
-                                const cleaned = text.replace(/[^0-9]/g, '');
-                                const val = cleaned ? parseInt(cleaned, 10) : 0;
-                                updateDraftPercentage(denomVal, val);
-                              }}
-                              keyboardType="number-pad"
-                              maxLength={3}
-                              style={styles.percentTextInput}
-                              selectTextOnFocus
-                            />
-                            <Text style={styles.percentSuffixText}>%</Text>
-                          </View>
-
-                          <TouchableOpacity
-                            activeOpacity={0.7}
-                            onPress={() => adjustDraftPercentage(denomVal, 1)}
-                            style={[styles.stepperMiniBtn, hardShadow(1)]}
-                          >
-                            <Ionicons name="add" size={16} color="#000" />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-
-                      {/* Visual Progress Fill Bar */}
-                      <View style={styles.noteProgressTrack}>
+                      <View style={styles.denomLeft}>
                         <View
                           style={[
-                            styles.noteProgressFill,
-                            {
-                              width: `${Math.min(100, Math.max(0, pct))}%`,
-                              backgroundColor: pct > 0 ? '#FACC15' : '#E5E7EB',
-                            },
+                            styles.denomBadge,
+                            { backgroundColor: denom.active ? '#FACC15' : '#E5E7EB' },
+                            hardShadow(1.5),
+                          ]}
+                        >
+                          <Text style={styles.denomBadgeText}>
+                            {CURRENCY_CONFIGS[currency]?.symbol || '₹'}
+                            {denom.value}
+                          </Text>
+                        </View>
+                        <View style={styles.denomMeta}>
+                          <Text style={styles.denomLabel}>
+                            {denom.label || `${CURRENCY_CONFIGS[currency]?.symbol}${denom.value} Note`}
+                          </Text>
+                          {is2000 && (
+                            <Text style={styles.denomSubLabel}>Withdrawn from regular circulation</Text>
+                          )}
+                        </View>
+                      </View>
+
+                      {/* Neubrutalist Toggle Button */}
+                      <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() => toggleDenomination(denom.value)}
+                        style={[
+                          styles.toggleButton,
+                          denom.active ? styles.toggleButtonOn : styles.toggleButtonOff,
+                          hardShadow(1.5),
+                        ]}
+                      >
+                        <View
+                          style={[
+                            styles.toggleThumb,
+                            denom.active ? styles.toggleThumbOn : styles.toggleThumbOff,
                           ]}
                         />
-                      </View>
+                        <Text
+                          style={[
+                            styles.toggleText,
+                            denom.active ? styles.toggleTextOn : styles.toggleTextOff,
+                          ]}
+                        >
+                          {denom.active ? 'ACTIVE' : 'OFF'}
+                        </Text>
+                      </TouchableOpacity>
                     </View>
                   );
                 })}
               </View>
-            )}
-          </View>
 
-          {/* Step 3: Preset Validation & Save */}
-          <View style={styles.splitSubSection}>
-            <View style={styles.splitStepHeader}>
-              <View style={styles.stepNumberBadge}>
-                <Text style={styles.stepNumberText}>3</Text>
-              </View>
-              <View style={styles.stepHeaderTextGroup}>
-                <Text style={styles.stepTitle}>VALIDATE & SAVE PRESET</Text>
-              </View>
-            </View>
-
-            {/* Validation Banner */}
-            <View
-              style={[
-                styles.validationBanner,
-                isExact100
-                  ? styles.validationBannerGreen
-                  : totalPercentage < 100
-                    ? styles.validationBannerAmber
-                    : styles.validationBannerRed,
-                hardShadow(2),
-              ]}
-            >
-              <Ionicons
-                name={
-                  isExact100
-                    ? 'checkmark-circle'
-                    : totalPercentage < 100
-                      ? 'warning'
-                      : 'alert-circle'
-                }
-                size={22}
-                color={
-                  isExact100
-                    ? '#065F46'
-                    : totalPercentage < 100
-                      ? '#92400E'
-                      : '#991B1B'
-                }
-              />
-              <View style={styles.validationTextGroup}>
-                <Text
-                  style={[
-                    styles.validationTitle,
-                    isExact100
-                      ? styles.validationTitleGreen
-                      : totalPercentage < 100
-                        ? styles.validationTitleAmber
-                        : styles.validationTitleRed,
-                  ]}
-                >
-                  {isExact100
-                    ? 'TOTAL: 100% (BALANCED)'
-                    : totalPercentage < 100
-                      ? `TOTAL: ${totalPercentage}% (${100 - totalPercentage}% SHORT OF 100%)`
-                      : `TOTAL: ${totalPercentage}% (EXCEEDS 100% BY ${totalPercentage - 100}%)`}
-                </Text>
-                <Text
-                  style={[
-                    styles.validationSubtitle,
-                    isExact100
-                      ? styles.validationSubtitleGreen
-                      : totalPercentage < 100
-                        ? styles.validationSubtitleAmber
-                        : styles.validationSubtitleRed,
-                  ]}
-                >
-                  {isExact100
-                    ? 'Preset is perfectly balanced! Tap Save Split Preset below.'
-                    : totalPercentage < 100
-                      ? 'Cannot save: total must not be less than 100%. Tap "Auto-Balance" or adjust sliders.'
-                      : 'Cannot save: total must not exceed 100%. Reduce sliders or tap "Auto-Balance".'}
-                </Text>
-              </View>
-            </View>
-
-            {/* Allocation Progress Bar */}
-            <View style={[styles.progressBarTrack, { marginBottom: 12 }]}>
-              <View
-                style={[
-                  styles.progressBarFill,
-                  {
-                    width: `${Math.min(100, totalPercentage)}%`,
-                    backgroundColor: isExact100
-                      ? '#10B981'
-                      : totalPercentage < 100
-                        ? '#F59E0B'
-                        : '#EF4444',
-                  },
-                ]}
-              />
-            </View>
-
-            {/* Quick Helper Tools */}
-            <View style={styles.presetButtonsRow}>
+              {/* Reset button */}
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={handleAutoBalance}
-                style={[styles.splitPresetBtn, { backgroundColor: '#BAE6FD' }, hardShadow(1.5)]}
+                onPress={resetDenominations}
+                style={[styles.resetDefaultsButton, hardShadow(2.5)]}
               >
-                <Ionicons name="git-merge-outline" size={15} color="#000" />
-                <Text style={styles.splitPresetBtnText}>Auto-Balance</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={handleApplyBankPreset}
-                style={[styles.splitPresetBtn, { backgroundColor: '#FDE047' }, hardShadow(1.5)]}
-              >
-                <Ionicons name="sparkles-outline" size={15} color="#000" />
-                <Text style={styles.splitPresetBtnText}>50/30/20 Bank</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={handleResetToSaved}
-                style={[styles.splitPresetBtn, { backgroundColor: '#F3F4F6' }, hardShadow(1.5)]}
-              >
-                <Ionicons name="refresh-outline" size={15} color="#000" />
-                <Text style={styles.splitPresetBtnText}>Reset</Text>
+                <Ionicons name="refresh-circle-outline" size={20} color="#000" />
+                <Text style={styles.resetDefaultsText}>RESET TO BANK DEFAULTS</Text>
               </TouchableOpacity>
             </View>
-
-            {/* Save Preset Button */}
-            <TouchableOpacity
-              activeOpacity={isExact100 ? 0.8 : 1}
-              onPress={handleSavePreset}
-              disabled={!isExact100}
-              style={[
-                styles.savePresetButton,
-                isExact100 ? styles.savePresetButtonActive : styles.savePresetButtonDisabled,
-                isExact100 && hardShadow(3),
-              ]}
-            >
-              <Ionicons
-                name={isExact100 ? 'checkmark-circle' : 'lock-closed-outline'}
-                size={20}
-                color={isExact100 ? '#000' : '#6B7280'}
-              />
-              <Text
-                style={[
-                  styles.savePresetButtonText,
-                  isExact100
-                    ? styles.savePresetButtonTextActive
-                    : styles.savePresetButtonTextDisabled,
-                ]}
-              >
-                {isExact100
-                  ? 'SAVE SPLIT PRESET'
-                  : `CANNOT SAVE (TOTAL ${totalPercentage}%, MUST BE 100%)`}
-              </Text>
-            </TouchableOpacity>
-
-            {/* Save Success Alert */}
-            {savedSuccess && (
-              <View style={[styles.savedSuccessCard, hardShadow(2)]}>
-                <Ionicons name="checkmark-done-circle" size={20} color="#065F46" />
-                <Text style={styles.savedSuccessText}>
-                  Split preset saved successfully! Active on Cashier counter.
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-
-        {/* Denomination Manager Section */}
-        <View style={[styles.sectionCard, hardShadow(4)]}>
-          <View style={styles.sectionHeaderRow}>
-            <Ionicons name="list-circle-outline" size={22} color="#000" />
-            <Text style={styles.sectionTitle}>DENOMINATION MANAGER</Text>
-          </View>
-
-          <View style={styles.denominationsList}>
-            {denominations.map((denom) => {
-              const is2000 = denom.value === 2000;
-              return (
-                <View
-                  key={denom.value}
-                  style={[
-                    styles.denomRow,
-                    denom.active ? styles.denomRowActive : styles.denomRowInactive,
-                    hardShadow(2),
-                  ]}
-                >
-                  <View style={styles.denomLeft}>
-                    <View
-                      style={[
-                        styles.denomBadge,
-                        { backgroundColor: denom.active ? '#FACC15' : '#E5E7EB' },
-                        hardShadow(1.5),
-                      ]}
-                    >
-                      <Text style={styles.denomBadgeText}>
-                        {CURRENCY_CONFIGS[currency]?.symbol || '₹'}
-                        {denom.value}
-                      </Text>
-                    </View>
-                    <View style={styles.denomMeta}>
-                      <Text style={styles.denomLabel}>
-                        {denom.label || `${CURRENCY_CONFIGS[currency]?.symbol}${denom.value} Note`}
-                      </Text>
-                      {is2000 && (
-                        <Text style={styles.denomSubLabel}>Withdrawn from regular circulation</Text>
-                      )}
-                    </View>
-                  </View>
-
-                  {/* Neubrutalist Toggle Button */}
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={() => toggleDenomination(denom.value)}
-                    style={[
-                      styles.toggleButton,
-                      denom.active ? styles.toggleButtonOn : styles.toggleButtonOff,
-                      hardShadow(1.5),
-                    ]}
-                  >
-                    <View
-                      style={[
-                        styles.toggleThumb,
-                        denom.active ? styles.toggleThumbOn : styles.toggleThumbOff,
-                      ]}
-                    />
-                    <Text
-                      style={[
-                        styles.toggleText,
-                        denom.active ? styles.toggleTextOn : styles.toggleTextOff,
-                      ]}
-                    >
-                      {denom.active ? 'ACTIVE' : 'OFF'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
-          </View>
-
-          {/* Reset button */}
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={resetDenominations}
-            style={[styles.resetDefaultsButton, hardShadow(2.5)]}
-          >
-            <Ionicons name="refresh-circle-outline" size={20} color="#000" />
-            <Text style={styles.resetDefaultsText}>RESET TO BANK DEFAULTS</Text>
-          </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -832,19 +997,41 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 12,
   },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
   headerBadge: {
     alignSelf: 'flex-start',
     backgroundColor: '#000',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
-    marginBottom: 6,
   },
   headerBadgeText: {
     color: '#FFF',
     fontSize: 10,
     fontWeight: '900',
     letterSpacing: 1,
+  },
+  expandAllBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#FFF',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: '#000',
+  },
+  expandAllBtnText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#000',
+    letterSpacing: 0.3,
   },
   headerTitle: {
     fontSize: 24,
@@ -859,10 +1046,76 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   sectionCard: {
-    backgroundColor: '#FFF',
     borderRadius: 8,
     padding: 10,
     marginBottom: 12,
+  },
+  sectionCardDefaultScreen: {
+    backgroundColor: '#DDD6FE',
+  },
+  sectionCardCurrency: {
+    backgroundColor: '#FEF08A',
+  },
+  sectionCardQuickAdd: {
+    backgroundColor: '#FED7AA',
+  },
+  sectionCardCashSplit: {
+    backgroundColor: '#BAE6FD',
+  },
+  sectionCardDenominations: {
+    backgroundColor: '#BBF7D0',
+  },
+  sectionHeaderTouchable: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 2,
+  },
+  sectionHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+    marginRight: 6,
+  },
+  sectionIconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    backgroundColor: '#FFF',
+    borderWidth: 1.5,
+    borderColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sectionHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  summaryBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 2.5,
+    borderRadius: 5,
+    borderWidth: 1.5,
+    borderColor: '#000',
+  },
+  summaryBadgeText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#000',
+    letterSpacing: 0.3,
+  },
+  chevronBox: {
+    width: 24,
+    height: 24,
+    borderRadius: 5,
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sectionContent: {
+    marginTop: 12,
   },
   sectionHeaderRow: {
     flexDirection: 'row',
@@ -900,7 +1153,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FACC15',
   },
   currencyChipUnselected: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFF',
   },
   currencySymbol: {
     fontSize: 22,
@@ -1386,7 +1639,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#DCFCE7',
   },
   startupOptionCardInactive: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFF',
   },
   startupOptionLeft: {
     flexDirection: 'row',

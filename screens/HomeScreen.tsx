@@ -93,7 +93,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ isActive = true }) => {
             <View style={styles.headerBadge}>
               <Text style={styles.headerBadgeText}>CASH BREAKDOWN</Text>
             </View>
-            <Text style={styles.headerTitle}>Cash Payment Counter</Text>
+            <Text style={styles.headerTitle}>Denomination Breakdown</Text>
           </View>
         </View>
 
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '900',
     color: '#4B5563',
-    marginBottom: 8,
+    marginBottom: 4,
     letterSpacing: 0.5,
   },
   presetButtonsRow: {

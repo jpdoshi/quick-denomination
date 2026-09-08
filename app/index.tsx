@@ -74,7 +74,7 @@ export default function Index() {
   }, [activeTab, defaultScreen]);
 
   const tabs: { key: TabKey; label: string; icon: keyof typeof Ionicons.glyphMap; color: string }[] = [
-    { key: 'counter', label: 'Counter', icon: 'calculator-outline', color: '#FACC15' },
+    { key: 'counter', label: 'Breakdown', icon: 'calculator-outline', color: '#FACC15' },
     { key: 'receipt', label: 'Receipt', icon: 'cash-outline', color: '#86EFAC' },
     { key: 'settings', label: 'Settings', icon: 'settings-outline', color: '#67E8F9' },
     { key: 'about', label: 'About', icon: 'heart-outline', color: '#FDA4AF' },
