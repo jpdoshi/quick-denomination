@@ -41,7 +41,8 @@
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": true
+      "reactCompiler": true,
+      "baseUrl": "/quick-denomination"
     },
     "extra": {
       "router": {},

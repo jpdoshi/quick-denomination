@@ -13,7 +13,7 @@ import {
 import { hardShadow } from '@/utils/hardShadow';
 
 const UPI_ID = 'jpdoshi2811@okaxis';
-const GITHUB_URL = 'https://github.com/jpdoshi/quick-denominator';
+const GITHUB_URL = 'https://github.com/jpdoshi/quick-denomination';
 
 export const AboutScreen: React.FC = () => {
   const [copied, setCopied] = useState(false);
